@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="en" target-language="de" datatype="plaintext"
+        original="EXT:ot_iconselector/Configuration/Sets/OtIconselector/labels.xlf"
+        product-name="ot-iconselector">
+    <header/>
+    <body>
+      <trans-unit id="label" resname="label" approved="yes">
+        <source>Icon Selector</source>
+        <target>Icon-Auswahl</target>
+      </trans-unit>
+      <trans-unit id="categories.otIconselector" resname="categories.otIconselector" approved="yes">
+        <source>Icon Selector</source>
+        <target>Icon-Auswahl</target>
+      </trans-unit>
+      <trans-unit id="settings.otIconselector.favorites.default" resname="settings.otIconselector.favorites.default" approved="yes">
+        <source>Default Favorites</source>
+        <target>Standard-Favoriten</target>
+      </trans-unit>
+      <trans-unit id="settings.description.otIconselector.favorites.default" resname="settings.description.otIconselector.favorites.default" approved="yes">
+        <source>Comma-separated icon identifiers shown as favorites for all icon selector fields (e.g. chevron-right,phone,envelope)</source>
+        <target>Komma-getrennte Icon-Identifier, die als Favoriten in allen Icon-Auswahlfeldern angezeigt werden (z.B. chevron-right,phone,envelope)</target>
+      </trans-unit>
+      <trans-unit id="settings.otIconselector.favorites.buttons" resname="settings.otIconselector.favorites.buttons" approved="yes">
+        <source>Button Favorites</source>
+        <target>Button-Favoriten</target>
+      </trans-unit>
+      <trans-unit id="settings.description.otIconselector.favorites.buttons" resname="settings.description.otIconselector.favorites.buttons" approved="yes">
+        <source>Comma-separated icon identifiers shown as favorites for button icon fields</source>
+        <target>Komma-getrennte Icon-Identifier, die als Favoriten in Button-Icon-Feldern angezeigt werden</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

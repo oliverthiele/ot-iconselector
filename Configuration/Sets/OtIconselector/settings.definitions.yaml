@@ -1,0 +1,13 @@
+categories:
+  otIconselector:
+
+settings:
+  otIconselector.favorites.default:
+    category: otIconselector
+    type: string
+    default: ''
+
+  otIconselector.favorites.buttons:
+    category: otIconselector
+    type: string
+    default: ''
