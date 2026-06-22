@@ -34,6 +34,7 @@ class IconSelectorElement extends HTMLElement {
     this.applyGridStyles();
     this.bindRemoveButton();
     this.registerEventListeners();
+    this.observeIconStyleField();
   }
 
   parseList(value) {
@@ -68,6 +69,58 @@ class IconSelectorElement extends HTMLElement {
     if (this.favoritesButton) {
       this.favoritesButton.addEventListener('click', () => this.openFavoritesModal());
     }
+  }
+
+  observeIconStyleField() {
+    const hiddenName = this.hiddenInput.name;
+    const iconStyleName = hiddenName.replace(/\[icon_identifier\]$/, '[icon_style]');
+    const cssSelector = `select[name="${CSS.escape(iconStyleName)}"]`;
+
+    const bind = () => {
+      const iconStyleSelect = document.querySelector(cssSelector);
+      if (!iconStyleSelect) {
+        return;
+      }
+      iconStyleSelect.addEventListener('change', () => {
+        const newStyle = iconStyleSelect.value;
+        if (newStyle !== '') {
+          this.iconStyle = newStyle;
+        }
+        this.hideGrid();
+        this.currentResults = [];
+        this.refreshSelectedPreview();
+      });
+    };
+
+    requestAnimationFrame(bind);
+  }
+
+  refreshSelectedPreview() {
+    const identifier = this.hiddenInput.value;
+    if (identifier === '') {
+      return;
+    }
+    new AjaxRequest(this.ajaxUrl)
+      .withQueryArguments({
+        search: identifier,
+        iconDirectory: this.iconDirectory,
+        iconStyle: this.iconStyle,
+        maxResults: 5,
+      })
+      .get()
+      .then(async (response) => {
+        const data = await response.resolve();
+        if (!Array.isArray(data)) {
+          return;
+        }
+        const match = data.find((item) => item.identifier === identifier);
+        if (match) {
+          const svgWrap = this.selectedContainer.querySelector('.ot-iconselector-preview-svg');
+          if (svgWrap) {
+            svgWrap.innerHTML = match.svg;
+          }
+        }
+      });
   }
 
   handleKeydown(event) {
@@ -159,26 +212,26 @@ class IconSelectorElement extends HTMLElement {
     button.title = item.identifier;
     button.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 4px;border:1px solid transparent;border-radius:var(--bs-border-radius);background:none;cursor:pointer;min-height:72px;transition:background-color .15s,border-color .15s';
 
+    const svgWrap = document.createElement('div');
+    svgWrap.style.cssText = 'width:32px;height:32px;flex-shrink:0';
+    svgWrap.innerHTML = item.svg;
+    button.appendChild(svgWrap);
+
+    const label = this.createMarqueeLabel(item.identifier, '10px', '4px');
+    button.appendChild(label);
+
     button.addEventListener('mouseenter', () => {
       button.style.backgroundColor = 'var(--bs-tertiary-bg)';
       button.style.borderColor = 'var(--bs-border-color)';
+      this.startMarquee(label);
     });
     button.addEventListener('mouseleave', () => {
       if (!button.classList.contains('is-active')) {
         button.style.backgroundColor = '';
         button.style.borderColor = 'transparent';
       }
+      this.stopMarquee(label);
     });
-
-    const svgWrap = document.createElement('div');
-    svgWrap.style.cssText = 'width:32px;height:32px;flex-shrink:0';
-    svgWrap.innerHTML = item.svg;
-    button.appendChild(svgWrap);
-
-    const label = document.createElement('span');
-    label.style.cssText = 'font-size:10px;line-height:1.2;margin-top:4px;word-break:break-all;text-align:center;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical';
-    label.textContent = item.identifier;
-    button.appendChild(label);
 
     if (allFavorites) {
       const isFavorite = allFavorites.includes(item.identifier);
@@ -198,6 +251,54 @@ class IconSelectorElement extends HTMLElement {
     }
 
     return button;
+  }
+
+  createMarqueeLabel(text, fontSize, marginTop) {
+    const label = document.createElement('span');
+    label.style.cssText = `font-size:${fontSize};line-height:1.2;margin-top:${marginTop};text-align:center;align-self:stretch;overflow:hidden`;
+
+    const inner = document.createElement('span');
+    inner.style.cssText = 'display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis';
+    inner.textContent = text;
+    label.appendChild(inner);
+
+    label._marqueeInner = inner;
+    return label;
+  }
+
+  startMarquee(label) {
+    const inner = label._marqueeInner;
+    if (!inner) {
+      return;
+    }
+    const overflow = inner.scrollWidth - inner.clientWidth;
+    if (overflow <= 0) {
+      return;
+    }
+    inner.style.overflow = 'visible';
+    inner.style.textOverflow = 'clip';
+    inner.animate([
+      { transform: 'translateX(0)', offset: 0 },
+      { transform: 'translateX(0)', offset: 0.1 },
+      { transform: `translateX(-${overflow}px)`, offset: 0.45 },
+      { transform: `translateX(-${overflow}px)`, offset: 0.55 },
+      { transform: 'translateX(0)', offset: 0.9 },
+      { transform: 'translateX(0)', offset: 1 },
+    ], {
+      duration: Math.max(2000, overflow * 50),
+      iterations: Infinity,
+      easing: 'linear',
+    });
+  }
+
+  stopMarquee(label) {
+    const inner = label._marqueeInner;
+    if (!inner) {
+      return;
+    }
+    inner.getAnimations().forEach((animation) => animation.cancel());
+    inner.style.overflow = 'hidden';
+    inner.style.textOverflow = 'ellipsis';
   }
 
   openFavoritesModal() {
@@ -264,9 +365,7 @@ class IconSelectorElement extends HTMLElement {
       svgWrap.innerHTML = item.svg;
       button.appendChild(svgWrap);
 
-      const label = document.createElement('span');
-      label.style.cssText = 'font-size:11px;line-height:1.2;word-break:break-all;text-align:center;max-width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical';
-      label.textContent = item.identifier;
+      const label = this.createMarqueeLabel(item.identifier, '11px', '6px');
       button.appendChild(label);
 
       if (!isIntegrator) {
@@ -281,6 +380,9 @@ class IconSelectorElement extends HTMLElement {
         });
         button.appendChild(removeBtn);
       }
+
+      button.addEventListener('mouseenter', () => this.startMarquee(label));
+      button.addEventListener('mouseleave', () => this.stopMarquee(label));
 
       button.addEventListener('click', () => {
         this.selectItem(item);
@@ -378,8 +480,17 @@ class IconSelectorElement extends HTMLElement {
             starElement.style.opacity = isFavorite ? '1' : '0.3';
             starElement.title = isFavorite ? 'Favorit entfernen' : 'Als Favorit merken';
           }
+          this.updateFavoritesButtonVisibility();
         }
       });
+  }
+
+  updateFavoritesButtonVisibility() {
+    if (!this.favoritesButton) {
+      return;
+    }
+    const allFavorites = [...new Set([...this.integratorFavorites, ...this.userFavorites])];
+    this.favoritesButton.style.display = allFavorites.length > 0 ? '' : 'none';
   }
 
   setActiveIndex(newIndex) {

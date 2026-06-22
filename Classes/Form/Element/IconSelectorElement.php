@@ -39,6 +39,15 @@ final class IconSelectorElement extends AbstractFormElement
             }
         }
 
+        $rawIconStyle = $this->data['databaseRow']['icon_style'] ?? '';
+        if (is_array($rawIconStyle)) {
+            $rawIconStyle = $rawIconStyle[0] ?? '';
+        }
+        $recordIconStyle = trim((string)$rawIconStyle);
+        if ($recordIconStyle !== '') {
+            $iconStyle = $recordIconStyle;
+        }
+
         $maxResults = (int)($fieldConfig['maxResults'] ?? 36);
         $favoriteGroup = (string)($fieldConfig['favoriteGroup'] ?? 'default');
 
@@ -86,11 +95,10 @@ final class IconSelectorElement extends AbstractFormElement
 
         $inputGroupDisplay = $currentValue !== '' ? 'none' : 'flex';
         $html[] = '<div class="ot-iconselector-input-group" style="display:' . $inputGroupDisplay . ';gap:8px">';
-        if ($hasFavorites) {
-            $html[] = '<button type="button" class="btn btn-default ot-iconselector-favorites-btn" title="Favoriten anzeigen">';
-            $html[] = '<typo3-backend-icon identifier="actions-heart" size="small"></typo3-backend-icon>';
-            $html[] = '</button>';
-        }
+        $favoritesButtonStyle = $hasFavorites ? '' : ' style="display:none"';
+        $html[] = '<button type="button" class="btn btn-default ot-iconselector-favorites-btn"' . $favoritesButtonStyle . ' title="Favoriten anzeigen">';
+        $html[] = '<typo3-backend-icon identifier="actions-star" size="small"></typo3-backend-icon>';
+        $html[] = '</button>';
         $html[] = '<input type="text" class="form-control ot-iconselector-search" placeholder="Icon suchen..." autocomplete="off">';
         $html[] = '</div>';
 
@@ -136,6 +144,9 @@ final class IconSelectorElement extends AbstractFormElement
         }
 
         $filePath = rtrim($basePath, '/') . '/' . $iconStyle . '/' . $identifier . '.svg';
+        if (!file_exists($filePath)) {
+            $filePath = rtrim($basePath, '/') . '/brands/' . $identifier . '.svg';
+        }
         if (!file_exists($filePath)) {
             return '';
         }
