@@ -53,33 +53,48 @@ final class IconSelectorController
             return new JsonResponse([], 400);
         }
 
+        $brandsPath = rtrim($basePath, '/') . '/brands';
+        $hasBrandsDirectory = $iconStyle !== 'brands' && is_dir($brandsPath);
+
         $iconIndex = $this->getIconIndex($iconDirectory, $iconStyle, $directoryPath);
+        $brandsIndex = $hasBrandsDirectory
+            ? $this->getIconIndex($iconDirectory, 'brands', $brandsPath)
+            : [];
 
         $searchTerms = array_filter(
             array_map('trim', explode(' ', mb_strtolower($search)))
         );
 
         $matches = [];
+        $matchSources = [];
         foreach ($iconIndex as $identifier) {
-            $identifierLower = mb_strtolower($identifier);
-            $matchesAll = true;
-            foreach ($searchTerms as $term) {
-                if (!str_contains($identifierLower, $term)) {
-                    $matchesAll = false;
-                    break;
-                }
-            }
-            if ($matchesAll) {
+            if ($this->matchesAllTerms($identifier, $searchTerms)) {
                 $matches[] = $identifier;
+                $matchSources[$identifier] = $directoryPath;
             }
             if (count($matches) >= $maxResults) {
                 break;
             }
         }
 
+        if (count($matches) < $maxResults) {
+            foreach ($brandsIndex as $identifier) {
+                if (isset($matchSources[$identifier])) {
+                    continue;
+                }
+                if ($this->matchesAllTerms($identifier, $searchTerms)) {
+                    $matches[] = $identifier;
+                    $matchSources[$identifier] = $brandsPath;
+                }
+                if (count($matches) >= $maxResults) {
+                    break;
+                }
+            }
+        }
+
         $results = [];
         foreach ($matches as $identifier) {
-            $filePath = $directoryPath . '/' . $identifier . '.svg';
+            $filePath = $matchSources[$identifier] . '/' . $identifier . '.svg';
             $svgContent = file_get_contents($filePath);
             if ($svgContent === false) {
                 continue;
@@ -171,6 +186,20 @@ final class IconSelectorController
             return [];
         }
         return array_values(array_filter($stored, static fn(mixed $value): bool => is_string($value) && $value !== ''));
+    }
+
+    /**
+     * @param list<string> $searchTerms
+     */
+    private function matchesAllTerms(string $identifier, array $searchTerms): bool
+    {
+        $identifierLower = mb_strtolower($identifier);
+        foreach ($searchTerms as $term) {
+            if (!str_contains($identifierLower, $term)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private function isValidIconDirectory(string $iconDirectory): bool
