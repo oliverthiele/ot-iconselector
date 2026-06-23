@@ -22,6 +22,7 @@ class IconSelectorElement extends HTMLElement {
     this.favoriteUrl = this.dataset.favoriteUrl;
     this.iconDirectory = this.dataset.iconDirectory;
     this.iconStyle = this.dataset.iconStyle;
+    this.defaultIconStyle = this.dataset.iconStyle;
     this.maxResults = parseInt(this.dataset.maxResults ?? '36', 10);
     this.favoriteGroup = this.dataset.favoriteGroup ?? 'default';
     this.integratorFavorites = this.parseList(this.dataset.integratorFavorites);
@@ -83,9 +84,7 @@ class IconSelectorElement extends HTMLElement {
       }
       iconStyleSelect.addEventListener('change', () => {
         const newStyle = iconStyleSelect.value;
-        if (newStyle !== '') {
-          this.iconStyle = newStyle;
-        }
+        this.iconStyle = newStyle !== '' ? newStyle : this.defaultIconStyle;
         this.hideGrid();
         this.currentResults = [];
         this.refreshSelectedPreview();

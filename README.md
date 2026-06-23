@@ -2,7 +2,7 @@
 
 Custom backend form element for selecting SVG icons with AJAX search, live preview and a favorites system.
 
-[![TYPO3](https://img.shields.io/badge/TYPO3-13.4-orange.svg)](https://typo3.org/)
+[![TYPO3](https://img.shields.io/badge/TYPO3-13.4%20%7C%2014.3-orange.svg)](https://typo3.org/)
 [![Packagist Version](https://img.shields.io/packagist/v/oliverthiele/ot-iconselector.svg)](https://packagist.org/packages/oliverthiele/ot-iconselector)
 [![PHP](https://img.shields.io/packagist/dependency-v/oliverthiele/ot-iconselector/php.svg)](https://php.net/)
 [![License](https://img.shields.io/packagist/l/oliverthiele/ot-iconselector.svg)](LICENSE)
@@ -16,7 +16,7 @@ Custom backend form element for selecting SVG icons with AJAX search, live previ
 - **SVG preview** — inline SVG rendering in search results and selected state
 - **Multi-term search** — space-separated words are combined with AND logic (e.g. "chevron right")
 - **Keyboard navigation** — arrow keys, Enter to select, Escape to close
-- **Favorites modal** — integrator-defined and personal editor favorites, accessible via a heart button
+- **Favorites modal** — integrator-defined and personal editor favorites, accessible via a star button
 - **SiteSet configuration** — icon directory, style and favorites configurable per site
 - **No vendor lock-in** — works with any SVG icon set (FontAwesome, Bootstrap Icons, custom icons)
 - **Non-breaking integration** — stores plain string identifiers, existing values remain compatible
@@ -27,8 +27,8 @@ Custom backend form element for selecting SVG icons with AJAX search, live previ
 
 | Requirement | Version        |
 |-------------|----------------|
-| TYPO3       | ^13.4 \| ^14.3 |
-| PHP         | >=8.3          |
+| TYPO3       | `^13.4 \| ^14.3` |
+| PHP         | `>=8.3`          |
 
 ---
 
