@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="2.0" xmlns="urn:oasis:names:tc:xliff:document:2.0" srcLang="en" trgLang="de">
+  <file id="ot-iconselector-locallang-be"
+        original="EXT:ot_iconselector/Resources/Private/Language/locallang_be.xlf">
+    <unit id="formEngine.favorites.toggle">
+      <segment>
+        <source>Show favourites</source>
+        <target>Favoriten anzeigen</target>
+      </segment>
+    </unit>
+    <unit id="formEngine.favorites.title">
+      <segment>
+        <source>Favourites</source>
+        <target>Favoriten</target>
+      </segment>
+    </unit>
+    <unit id="formEngine.search.placeholder">
+      <segment>
+        <source>Search icon...</source>
+        <target>Icon suchen...</target>
+      </segment>
+    </unit>
+    <unit id="formEngine.remove">
+      <segment>
+        <source>Remove</source>
+        <target>Entfernen</target>
+      </segment>
+    </unit>
+  </file>
+</xliff>

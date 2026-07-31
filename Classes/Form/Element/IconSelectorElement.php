@@ -87,6 +87,10 @@ final class IconSelectorElement extends AbstractFormElement
         $html[] = ' data-favorite-group="' . htmlspecialchars($favoriteGroup) . '"';
         $html[] = ' data-integrator-favorites="' . htmlspecialchars(implode(',', $integratorFavorites)) . '"';
         $html[] = ' data-user-favorites="' . htmlspecialchars(implode(',', $userFavorites)) . '"';
+        // The JavaScript module cannot read XLF files, so the labels it renders
+        // are handed over as data attributes.
+        $html[] = ' data-label-favorites="' . htmlspecialchars($this->translate('formEngine.favorites.title')) . '"';
+        $html[] = ' data-label-remove="' . htmlspecialchars($this->translate('formEngine.remove')) . '"';
         $html[] = '>';
 
         $html[] = '<div class="ot-iconselector-selected" id="' . htmlspecialchars($fieldId) . '-selected">';
@@ -96,10 +100,12 @@ final class IconSelectorElement extends AbstractFormElement
         $inputGroupDisplay = $currentValue !== '' ? 'none' : 'flex';
         $html[] = '<div class="ot-iconselector-input-group" style="display:' . $inputGroupDisplay . ';gap:8px">';
         $favoritesButtonStyle = $hasFavorites ? '' : ' style="display:none"';
-        $html[] = '<button type="button" class="btn btn-default ot-iconselector-favorites-btn"' . $favoritesButtonStyle . ' title="Favoriten anzeigen">';
+        $html[] = '<button type="button" class="btn btn-default ot-iconselector-favorites-btn"' . $favoritesButtonStyle
+            . ' title="' . htmlspecialchars($this->translate('formEngine.favorites.toggle')) . '">';
         $html[] = '<typo3-backend-icon identifier="actions-star" size="small"></typo3-backend-icon>';
         $html[] = '</button>';
-        $html[] = '<input type="text" class="form-control ot-iconselector-search" placeholder="Icon suchen..." autocomplete="off">';
+        $html[] = '<input type="text" class="form-control ot-iconselector-search" placeholder="'
+            . htmlspecialchars($this->translate('formEngine.search.placeholder')) . '" autocomplete="off">';
         $html[] = '</div>';
 
         $html[] = '<div class="ot-iconselector-grid" style="display:none"></div>';
@@ -119,6 +125,14 @@ final class IconSelectorElement extends AbstractFormElement
         return $result;
     }
 
+    /**
+     * Resolves a backend label from this extension's translation domain.
+     */
+    private function translate(string $key): string
+    {
+        return $this->getLanguageService()->sL('ot_iconselector.be:' . $key);
+    }
+
     private function buildSelectedPreview(string $identifier, string $iconDirectory, string $iconStyle): string
     {
         $svgContent = $this->readSvgFile($identifier, $iconDirectory, $iconStyle);
@@ -128,7 +142,8 @@ final class IconSelectorElement extends AbstractFormElement
         $html .= $svgContent;
         $html .= '</div>';
         $html .= '<span class="ot-iconselector-identifier-label flex-grow-1">' . htmlspecialchars($identifier) . '</span>';
-        $html .= '<button type="button" class="btn btn-default btn-sm ot-iconselector-remove" title="Entfernen">';
+        $html .= '<button type="button" class="btn btn-default btn-sm ot-iconselector-remove" title="'
+            . htmlspecialchars($this->translate('formEngine.remove')) . '">';
         $html .= '<typo3-backend-icon identifier="actions-close" size="small"></typo3-backend-icon>';
         $html .= '</button>';
         $html .= '</div>';
