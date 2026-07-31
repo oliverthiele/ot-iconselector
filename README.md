@@ -2,7 +2,7 @@
 
 Custom backend form element for selecting SVG icons with AJAX search, live preview and a favorites system.
 
-[![TYPO3](https://img.shields.io/badge/TYPO3-13.4%20%7C%2014.3-orange.svg)](https://typo3.org/)
+[![TYPO3](https://img.shields.io/badge/TYPO3-14.3-orange.svg)](https://typo3.org/)
 [![Packagist Version](https://img.shields.io/packagist/v/oliverthiele/ot-iconselector.svg)](https://packagist.org/packages/oliverthiele/ot-iconselector)
 [![PHP](https://img.shields.io/packagist/dependency-v/oliverthiele/ot-iconselector/php.svg)](https://php.net/)
 [![License](https://img.shields.io/packagist/l/oliverthiele/ot-iconselector.svg)](LICENSE)
@@ -27,8 +27,8 @@ Custom backend form element for selecting SVG icons with AJAX search, live previ
 
 | Requirement | Version        |
 |-------------|----------------|
-| TYPO3       | `^13.4 \| ^14.3` |
-| PHP         | `>=8.3`          |
+| TYPO3       | `^14.3`          |
+| PHP         | `>=8.4`          |
 
 ---
 

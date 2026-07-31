@@ -6,7 +6,6 @@
 	"license": [
 		"GPL-2.0-or-later"
 	],
-	"version": "1.0.0",
 	"authors": [
 		{
 			"name": "Oliver Thiele",
@@ -15,8 +14,8 @@
 		}
 	],
 	"require": {
-		"php": ">=8.3",
-		"typo3/cms-core": "^13.4||^14.3"
+		"php": ">=8.4",
+		"typo3/cms-core": "^14.3"
 	},
 	"suggest": {
 		"oliverthiele/ot-icons": "Icon rendering via Fluid ViewHelper — the selector works with any SVG icon directory"
