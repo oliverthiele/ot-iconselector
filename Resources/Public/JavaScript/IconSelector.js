@@ -27,6 +27,9 @@ class IconSelectorElement extends HTMLElement {
     this.favoriteGroup = this.dataset.favoriteGroup ?? 'default';
     this.integratorFavorites = this.parseList(this.dataset.integratorFavorites);
     this.userFavorites = this.parseList(this.dataset.userFavorites);
+    // Labels come from the PHP side, which resolves them from the XLF files
+    this.labelFavorites = this.dataset.labelFavorites ?? 'Favourites';
+    this.labelRemove = this.dataset.labelRemove ?? 'Remove';
 
     this.debounceTimer = null;
     this.activeIndex = -1;
@@ -392,7 +395,7 @@ class IconSelectorElement extends HTMLElement {
     });
 
     const modal = Modal.advanced({
-      title: 'Favoriten',
+      title: this.labelFavorites,
       content: gridContainer,
       severity: SeverityEnum.info,
       size: Modal.sizes.medium,
@@ -432,7 +435,7 @@ class IconSelectorElement extends HTMLElement {
     const removeButton = document.createElement('button');
     removeButton.type = 'button';
     removeButton.className = 'btn btn-default btn-sm ot-iconselector-remove';
-    removeButton.title = 'Entfernen';
+    removeButton.title = this.labelRemove;
     removeButton.innerHTML = '<typo3-backend-icon identifier="actions-close" size="small"></typo3-backend-icon>';
     preview.appendChild(removeButton);
 
