@@ -61,9 +61,10 @@ final class IconSelectorController
             ? $this->getIconIndex($iconDirectory, 'brands', $brandsPath)
             : [];
 
-        $searchTerms = array_filter(
-            array_map('trim', explode(' ', mb_strtolower($search)))
-        );
+        // array_filter preserves keys, so array_values is what makes this a list again.
+        $searchTerms = array_values(array_filter(
+            array_map(static fn(string $term): string => trim($term), explode(' ', mb_strtolower($search)))
+        ));
 
         $matches = [];
         $matchSources = [];
@@ -116,7 +117,9 @@ final class IconSelectorController
 
         $cached = $this->getCache()->get($cacheKey);
         if (is_array($cached)) {
-            return $cached;
+            // The cache is untyped and may still hold an entry written by an
+            // earlier format, so the shape is checked rather than assumed.
+            return array_values(array_filter($cached, static fn(mixed $value): bool => is_string($value)));
         }
 
         $identifiers = [];
@@ -155,9 +158,14 @@ final class IconSelectorController
 
     public function toggleFavoriteAction(ServerRequestInterface $request): ResponseInterface
     {
+        // getParsedBody() is null, array or object — only an array carries the fields.
         $body = $request->getParsedBody();
-        $identifier = trim((string)($body['identifier'] ?? ''));
-        $group = trim((string)($body['group'] ?? 'default'));
+        $body = is_array($body) ? $body : [];
+
+        $identifierRaw = $body['identifier'] ?? '';
+        $groupRaw = $body['group'] ?? 'default';
+        $identifier = is_scalar($identifierRaw) ? trim((string)$identifierRaw) : '';
+        $group = is_scalar($groupRaw) ? trim((string)$groupRaw) : 'default';
 
         if ($identifier === '') {
             return new JsonResponse(['success' => false], 400);
