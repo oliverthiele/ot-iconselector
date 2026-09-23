@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.1] — 2026-09-23
+
+### Added
+
+- `readOnly` is honoured: the element then shows the icon and its identifier
+  only — no search, no grid, no remove button, no JavaScript and no input
+  carrying a name, so the form submits nothing for the field. TCA sets
+  `readOnly` directly, and FormEngine sets it for a translated record whose
+  `l10n_display` says `defaultAsReadonly`
+
+### Fixed
+
+- The element renders the default field wizards every core input element
+  carries (`localizationStateSelector`, `otherLanguageContent`,
+  `defaultLanguageDifferences`). Without them a translated record showed no
+  radio buttons for "use the value of the default language", so a field
+  configured with `allowLanguageSynchronization` could not be decoupled per
+  language — and the editor was not told that the value is inherited
+- Narrow untyped values at their boundary in `IconSelectorController`, five
+  PHPStan findings of the same shape
+
+---
+
 ## [2.0.0] — 2026-07-31
 
 ### Added
@@ -54,6 +77,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Reset to SiteSet default icon style when "Default" is selected in `icon_style` dropdown
 
-[Unreleased]: https://github.com/oliverthiele/ot-iconselector/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/oliverthiele/ot-iconselector/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/oliverthiele/ot-iconselector/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/oliverthiele/ot-iconselector/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/oliverthiele/ot-iconselector/releases/tag/v1.0.0
