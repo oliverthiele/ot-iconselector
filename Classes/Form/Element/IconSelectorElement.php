@@ -15,6 +15,35 @@ use TYPO3\CMS\Core\Utility\StringUtility;
 
 final class IconSelectorElement extends AbstractFormElement
 {
+    /**
+     * Default field wizards enabled for this element, the same set every core
+     * input element carries.
+     *
+     * Without them a translated record shows no radio buttons for
+     * "use the value of the default language", so a field configured with
+     * allowLanguageSynchronization cannot be decoupled per language — and the
+     * editor is not even told that the value is inherited.
+     *
+     * @var array<string, array<string, mixed>>
+     */
+    protected $defaultFieldWizard = [
+        'localizationStateSelector' => [
+            'renderType' => 'localizationStateSelector',
+        ],
+        'otherLanguageContent' => [
+            'renderType' => 'otherLanguageContent',
+            'after' => [
+                'localizationStateSelector',
+            ],
+        ],
+        'defaultLanguageDifferences' => [
+            'renderType' => 'defaultLanguageDifferences',
+            'after' => [
+                'otherLanguageContent',
+            ],
+        ],
+    ];
+
     /** @return array<string, mixed> */
     public function render(): array
     {
@@ -48,6 +77,7 @@ final class IconSelectorElement extends AbstractFormElement
             $iconStyle = $recordIconStyle;
         }
 
+        $readOnly = (bool)($fieldConfig['readOnly'] ?? false);
         $maxResults = (int)($fieldConfig['maxResults'] ?? 36);
         $favoriteGroup = (string)($fieldConfig['favoriteGroup'] ?? 'default');
 
@@ -66,6 +96,10 @@ final class IconSelectorElement extends AbstractFormElement
         $fieldInformationHtml = $fieldInformationResult['html'];
         $result = $this->mergeChildReturnIntoExistingResult($result, $fieldInformationResult, false);
 
+        $fieldWizardResult = $this->renderFieldWizard();
+        $fieldWizardHtml = $fieldWizardResult['html'];
+        $result = $this->mergeChildReturnIntoExistingResult($result, $fieldWizardResult, false);
+
         $selectedHtml = '';
         if ($currentValue !== '') {
             $selectedHtml = $this->buildSelectedPreview($currentValue, $iconDirectory, $iconStyle);
@@ -76,6 +110,23 @@ final class IconSelectorElement extends AbstractFormElement
         $html[] = '<div class="formengine-field-item t3js-formengine-field-item">';
         $html[] = $fieldInformationHtml;
         $html[] = '<div class="form-control-wrap">';
+
+        // A read-only field shows the icon and nothing to operate: no search, no
+        // grid, no JavaScript and no input carrying a name, so the form submits
+        // nothing for it. TCA sets readOnly directly, and FormEngine sets it for
+        // a translated record whose l10n_display says defaultAsReadonly.
+        if ($readOnly) {
+            $html[] = $selectedHtml !== ''
+                ? $this->buildReadOnlyPreview($currentValue, $iconDirectory, $iconStyle)
+                : '<input type="text" class="form-control" value="" disabled>';
+            $html[] = '</div>';
+            $html[] = '<div class="form-text">' . $fieldWizardHtml . '</div>';
+            $html[] = '</div>';
+
+            $result['html'] = implode(LF, $html);
+
+            return $result;
+        }
 
         $html[] = '<typo3-ot-icon-selector';
         $html[] = ' data-ajax-url="' . htmlspecialchars($ajaxUrl) . '"';
@@ -115,6 +166,10 @@ final class IconSelectorElement extends AbstractFormElement
         $html[] = '</typo3-ot-icon-selector>';
 
         $html[] = '</div>';
+        // Inside the field item, below the control: that is where the core
+        // elements put the wizards, and the localization state selector has to
+        // sit with the field it belongs to.
+        $html[] = '<div class="form-text">' . $fieldWizardHtml . '</div>';
         $html[] = '</div>';
 
         $result['html'] = implode(LF, $html);
@@ -131,6 +186,22 @@ final class IconSelectorElement extends AbstractFormElement
     private function translate(string $key): string
     {
         return $this->getLanguageService()->sL('ot_iconselector.be:' . $key);
+    }
+
+    /**
+     * The selected icon without the remove button — the read-only form of the
+     * preview.
+     */
+    private function buildReadOnlyPreview(string $identifier, string $iconDirectory, string $iconStyle): string
+    {
+        $html = '<div class="d-flex align-items-center gap-2 p-2 border rounded">';
+        $html .= '<div class="ot-iconselector-preview-svg" style="width:32px;height:32px;flex-shrink:0">';
+        $html .= $this->readSvgFile($identifier, $iconDirectory, $iconStyle);
+        $html .= '</div>';
+        $html .= '<span class="ot-iconselector-identifier-label flex-grow-1">' . htmlspecialchars($identifier) . '</span>';
+        $html .= '</div>';
+
+        return $html;
     }
 
     private function buildSelectedPreview(string $identifier, string $iconDirectory, string $iconStyle): string
