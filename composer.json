@@ -27,7 +27,11 @@
 	},
 	"extra": {
 		"typo3/cms": {
-			"extension-key": "ot_iconselector"
+			"extension-key": "ot_iconselector",
+			"version": "2.0.1",
+			"Package": {
+				"providesPackages": {}
+			}
 		}
 	}
 }
